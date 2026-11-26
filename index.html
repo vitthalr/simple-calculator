@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Calculator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: linear-gradient(135deg, #1e293b, #0f172a); font-family: system-ui, sans-serif; }
+  .calc { background: #1e1e2e; padding: 20px; border-radius: 20px; width: 320px;
+          box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+  .display { background: #11111b; color: #cdd6f4; border-radius: 12px; padding: 16px; margin-bottom: 16px;
+             text-align: right; min-height: 90px; word-wrap: break-word; }
+  .prev { color: #6c7086; font-size: 16px; min-height: 20px; }
+  .cur { font-size: 36px; font-weight: 600; }
+  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  button { padding: 18px 0; font-size: 20px; border: none; border-radius: 12px; cursor: pointer;
+           background: #313244; color: #cdd6f4; transition: filter .1s, transform .05s; }
+  button:hover { filter: brightness(1.2); }
+  button:active { transform: scale(.95); }
+  .op { background: #fab387; color: #11111b; }
+  .fn { background: #45475a; }
+  .eq { background: #a6e3a1; color: #11111b; grid-column: span 2; }
+  .zero { grid-column: span 2; }
+</style>
+</head>
+<body>
+<div class="calc">
+  <div class="display"><div class="prev" id="prev"></div><div class="cur" id="cur">0</div></div>
+  <div class="keys">
+    <button class="fn" data-a="clear">AC</button>
+    <button class="fn" data-a="del">⌫</button>
+    <button class="fn" data-a="pct">%</button>
+    <button class="op" data-op="/">÷</button>
+    <button data-n="7">7</button><button data-n="8">8</button><button data-n="9">9</button>
+    <button class="op" data-op="*">×</button>
+    <button data-n="4">4</button><button data-n="5">5</button><button data-n="6">6</button>
+    <button class="op" data-op="-">−</button>
+    <button data-n="1">1</button><button data-n="2">2</button><button data-n="3">3</button>
+    <button class="op" data-op="+">+</button>
+    <button class="zero" data-n="0">0</button>
+    <button data-n=".">.</button>
+    <button class="fn" data-a="neg">±</button>
+    <button class="eq" data-a="eq" style="grid-column: span 4">=</button>
+  </div>
+</div>
+<script>
+  const sym = { '/': '÷', '*': '×', '-': '−', '+': '+' };
+  let cur = '0', prev = null, op = null, reset = false;
+  const $cur = document.getElementById('cur'), $prev = document.getElementById('prev');
+
+  function render() {
+    $cur.textContent = cur;
+    $prev.textContent = prev !== null && op ? `${prev} ${sym[op]}` : '';
+  }
+  function compute(a, b, o) {
+    a = parseFloat(a); b = parseFloat(b);
+    let r = o === '+' ? a + b : o === '-' ? a - b : o === '*' ? a * b : b === 0 ? NaN : a / b;
+    if (!isFinite(r)) return 'Error';
+    return String(parseFloat(r.toPrecision(12)));
+  }
+  function inputNum(n) {
+    if (reset || cur === 'Error') { cur = '0'; reset = false; }
+    if (n === '.' && cur.includes('.')) return;
+    cur = cur === '0' && n !== '.' ? n : cur + n;
+  }
+  function setOp(o) {
+    if (cur === 'Error') return;
+    if (op && !reset) cur = compute(prev, cur, op);
+    prev = cur; op = o; reset = true;
+  }
+  function action(a) {
+    if (a === 'clear') { cur = '0'; prev = null; op = null; }
+    else if (a === 'del') { cur = reset || cur === 'Error' || cur.length <= 1 || (cur.length === 2 && cur[0] === '-') ? '0' : cur.slice(0, -1); reset = false; }
+    else if (a === 'pct') { if (cur !== 'Error') cur = String(parseFloat(cur) / 100); }
+    else if (a === 'neg') { if (cur !== '0' && cur !== 'Error') cur = cur.startsWith('-') ? cur.slice(1) : '-' + cur; }
+    else if (a === 'eq') { if (op) { cur = compute(prev, cur, op); prev = null; op = null; reset = true; } }
+  }
+  document.querySelector('.keys').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.n) inputNum(b.dataset.n);
+    else if (b.dataset.op) setOp(b.dataset.op);
+    else action(b.dataset.a);
+    render();
+  });
+  document.addEventListener('keydown', e => {
+    const k = e.key;
+    if (/^[0-9.]$/.test(k)) inputNum(k);
+    else if ('+-*/'.includes(k)) setOp(k);
+    else if (k === 'Enter' || k === '=') { e.preventDefault(); action('eq'); }
+    else if (k === 'Backspace') action('del');
+    else if (k === 'Escape') action('clear');
+    else if (k === '%') action('pct');
+    else return;
+    render();
+  });
+</script>
+</body>
+</html>
