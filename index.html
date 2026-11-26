@@ -7,26 +7,47 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { min-height: 100vh; display: flex; align-items: center; justify-content: center;
-         background: linear-gradient(135deg, #1e293b, #0f172a); font-family: system-ui, sans-serif; }
-  .calc { background: #1e1e2e; padding: 20px; border-radius: 20px; width: 320px;
-          box-shadow: 0 20px 50px rgba(0,0,0,.5); }
-  .display { background: #11111b; color: #cdd6f4; border-radius: 12px; padding: 16px; margin-bottom: 16px;
-             text-align: right; min-height: 90px; word-wrap: break-word; }
-  .prev { color: #6c7086; font-size: 16px; min-height: 20px; }
-  .cur { font-size: 36px; font-weight: 600; }
-  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  button { padding: 18px 0; font-size: 20px; border: none; border-radius: 12px; cursor: pointer;
-           background: #313244; color: #cdd6f4; transition: filter .1s, transform .05s; }
-  button:hover { filter: brightness(1.2); }
-  button:active { transform: scale(.95); }
-  .op { background: #fab387; color: #11111b; }
-  .fn { background: #45475a; }
-  .eq { background: #a6e3a1; color: #11111b; grid-column: span 2; }
+         font-family: "Segoe UI", system-ui, sans-serif;
+         background: radial-gradient(circle at 30% 20%, #3a3f47 0%, #15171b 60%, #0a0b0d 100%); }
+  .calc { position: relative; width: 340px; padding: 26px 22px 22px; border-radius: 28px;
+          background:
+            repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, rgba(0,0,0,.04) 1px 2px, transparent 2px 4px),
+            linear-gradient(160deg, #e9ecef 0%, #b8bec6 22%, #8a9099 45%, #c9ced4 62%, #9ea4ac 80%, #6d737b 100%);
+          box-shadow: 0 30px 60px rgba(0,0,0,.6), 0 0 0 2px #50555c, 0 0 0 4px #c7ccd2, 0 0 0 6px #3b3f45,
+                      inset 0 2px 1px rgba(255,255,255,.9), inset 0 -3px 6px rgba(0,0,0,.35); }
+  .brand { font-size: 11px; letter-spacing: 4px; font-weight: 700; color: #3e434a; margin: 0 4px 10px;
+           text-shadow: 0 1px 0 rgba(255,255,255,.7); display: flex; justify-content: space-between; }
+  .brand span:last-child { letter-spacing: 1px; font-weight: 500; }
+  .display { border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; min-height: 96px; text-align: right;
+             word-wrap: break-word; font-family: "Courier New", ui-monospace, monospace; color: #1d2a1b;
+             background: linear-gradient(180deg, #a9b99a 0%, #c4d3b3 40%, #b3c3a2 100%);
+             box-shadow: inset 0 3px 8px rgba(0,0,0,.55), inset 0 -1px 2px rgba(255,255,255,.4),
+                         0 0 0 3px #2b2e33, 0 0 0 5px #9aa0a8, 0 1px 0 6px rgba(255,255,255,.5); }
+  .prev { font-size: 15px; min-height: 20px; opacity: .65; }
+  .cur { font-size: 38px; font-weight: 700; text-shadow: 1px 1px 0 rgba(0,0,0,.12); }
+  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  button { padding: 17px 0; font-size: 20px; font-weight: 600; border: none; border-radius: 14px; cursor: pointer;
+           color: #2a2e33; text-shadow: 0 1px 0 rgba(255,255,255,.75);
+           background: linear-gradient(180deg, #ffffff 0%, #dfe3e8 18%, #aeb4bc 50%, #c9ced4 78%, #f1f3f5 100%);
+           box-shadow: 0 4px 0 #555a61, 0 6px 10px rgba(0,0,0,.45), inset 0 1px 1px #fff, inset 0 -2px 3px rgba(0,0,0,.25);
+           transition: transform .06s, box-shadow .06s, filter .15s; }
+  button:hover { filter: brightness(1.07); }
+  button:active { transform: translateY(3px);
+                  box-shadow: 0 1px 0 #555a61, 0 2px 4px rgba(0,0,0,.45), inset 0 1px 1px #fff, inset 0 -1px 2px rgba(0,0,0,.25); }
+  .fn { color: #f2f4f6; text-shadow: 0 -1px 0 rgba(0,0,0,.6);
+        background: linear-gradient(180deg, #8d939b 0%, #5c6168 30%, #3a3e44 55%, #4e535a 80%, #7a8088 100%); }
+  .op { color: #3b2a05; text-shadow: 0 1px 0 rgba(255,240,200,.7);
+        background: linear-gradient(180deg, #fff3c4 0%, #f1cf6b 20%, #c89b2c 50%, #e3bb4f 78%, #fbe7a1 100%);
+        box-shadow: 0 4px 0 #7a5a12, 0 6px 10px rgba(0,0,0,.45), inset 0 1px 1px #fff8de, inset 0 -2px 3px rgba(80,50,0,.35); }
+  .eq { color: #3a1606; text-shadow: 0 1px 0 rgba(255,210,180,.6); grid-column: span 4;
+        background: linear-gradient(180deg, #ffd2b0 0%, #e59a63 22%, #b0602c 50%, #d4824a 78%, #f7c29a 100%);
+        box-shadow: 0 4px 0 #6b3412, 0 6px 10px rgba(0,0,0,.45), inset 0 1px 1px #ffe6d4, inset 0 -2px 3px rgba(70,25,0,.35); }
   .zero { grid-column: span 2; }
 </style>
 </head>
 <body>
 <div class="calc">
+  <div class="brand"><span>CHROME-12</span><span>●●●</span></div>
   <div class="display"><div class="prev" id="prev"></div><div class="cur" id="cur">0</div></div>
   <div class="keys">
     <button class="fn" data-a="clear">AC</button>
@@ -42,7 +63,7 @@
     <button class="zero" data-n="0">0</button>
     <button data-n=".">.</button>
     <button class="fn" data-a="neg">±</button>
-    <button class="eq" data-a="eq" style="grid-column: span 4">=</button>
+    <button class="eq" data-a="eq">=</button>
   </div>
 </div>
 <script>
